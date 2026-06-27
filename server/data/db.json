@@ -1,0 +1,130 @@
+{
+  "users": {
+    "guest_user_123": {
+      "userId": "guest_user_123",
+      "streak": 1,
+      "lastCompletedDate": "2026-06-26",
+      "weeklyCompleted": 1,
+      "workingHours": {
+        "start": "09:00",
+        "end": "17:00"
+      },
+      "timezone": "UTC",
+      "createdAt": "2026-06-22T17:16:16.666Z",
+      "memory": {
+        "preferredStudyTime": "Evening (5 PM - 9 PM)",
+        "averageCompletionRate": 50,
+        "productiveHours": [
+          "20:00"
+        ],
+        "procrastinationPattern": "Maintains a consistent pace without major procrastination.",
+        "strongestCategory": "Personal",
+        "weakestCategory": "School",
+        "averageTaskDuration": 60,
+        "streakHistory": [
+          1
+        ]
+      }
+    }
+  },
+  "tasks": {
+    "task_kq5hq6svo": {
+      "title": "assignment",
+      "description": "important",
+      "deadline": "2026-06-27",
+      "status": "completed",
+      "priority": "Medium",
+      "category": "Personal",
+      "subtasks": [
+        {
+          "title": "Research and gather resources for: assignment",
+          "durationMinutes": 45,
+          "order": 1,
+          "completed": true
+        },
+        {
+          "title": "Outline core components and plan layout",
+          "durationMinutes": 30,
+          "order": 2,
+          "completed": true
+        },
+        {
+          "title": "Execute main implementation of: assignment",
+          "durationMinutes": 120,
+          "order": 3,
+          "completed": true
+        },
+        {
+          "title": "Final review, testing, and adjustments",
+          "durationMinutes": 30,
+          "order": 4,
+          "completed": true
+        }
+      ],
+      "timeBlocks": [],
+      "importance": 3,
+      "estimatedEffort": 60,
+      "userId": "guest_user_123",
+      "createdAt": "2026-06-26T09:33:01.173Z",
+      "updatedAt": "2026-06-26T15:11:36.543Z",
+      "id": "task_kq5hq6svo"
+    },
+    "task_m1iopj9zk": {
+      "title": "hiiiiii",
+      "description": "",
+      "deadline": "2026-06-27",
+      "status": "pending",
+      "priority": "Medium",
+      "category": "School",
+      "subtasks": [
+        {
+          "title": "Research and gather resources for: hiiiiii",
+          "durationMinutes": 45,
+          "order": 1,
+          "completed": false
+        },
+        {
+          "title": "Outline core components and plan layout",
+          "durationMinutes": 30,
+          "order": 2,
+          "completed": false
+        },
+        {
+          "title": "Execute main implementation of: hiiiiii",
+          "durationMinutes": 120,
+          "order": 3,
+          "completed": false
+        },
+        {
+          "title": "Final review, testing, and adjustments",
+          "durationMinutes": 30,
+          "order": 4,
+          "completed": false
+        }
+      ],
+      "timeBlocks": [],
+      "importance": 3,
+      "estimatedEffort": 60,
+      "urgency": "critical",
+      "notes": "",
+      "userId": "guest_user_123",
+      "createdAt": "2026-06-26T15:10:33.803Z",
+      "updatedAt": "2026-06-26T15:10:38.703Z",
+      "id": "task_m1iopj9zk",
+      "suggestedExecutionFlow": "Start with gathering resources first, outline sections to avoid writers block, dedicate a solid 2-hour chunk for high-focus building, and finish with a quick verification check."
+    }
+  },
+  "analytics": {
+    "guest_user_123": {
+      "userId": "guest_user_123",
+      "history": [
+        {
+          "date": "2026-06-26",
+          "completed": 1,
+          "missed": 0
+        }
+      ],
+      "insights": "You tend to complete 80% of your tasks on Tuesdays and Thursdays.\nOne task (\"DBMS Homework\") was missed this week due to an underestimated duration. Consider adding 30 mins padding next time.\nYour daily streak is currently at 4 days. Keep it up to boost consistency!"
+    }
+  }
+}

@@ -1,0 +1,116 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-canvas: #000000;
+  --color-surface-card: #1a1a1a;
+  --color-surface-elevated: #262626;
+  --color-surface-soft: #0d0d0d;
+  
+  --color-ink: #ffffff;
+  --color-body: #bbbbbb;
+  --color-body-strong: #e6e6e6;
+  --color-muted: #7e7e7e;
+  
+  --color-hairline: #3c3c3c;
+  --color-hairline-strong: #262626;
+  
+  --color-m-blue-light: #0066b1;
+  --color-m-blue-dark: #1c69d4;
+  --color-m-red: #e22718;
+  --color-bmw-blue: #1c69d4;
+  
+  --color-warning: #f4b400;
+  --color-success: #0fa336;
+}
+
+@layer base {
+  body {
+    @apply bg-canvas text-body antialiased font-light selection:bg-ink selection:text-canvas;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-weight: 300;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    @apply text-ink uppercase tracking-wider;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-canvas;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-hairline rounded-none hover:bg-m-blue-dark transition-colors;
+}
+
+/* Redefine global components for BMW M spec alignment */
+.glass-panel {
+  @apply bg-surface-card border border-hairline rounded-none shadow-none;
+}
+
+.glass-panel-hover {
+  @apply hover:bg-surface-elevated hover:border-muted transition-all duration-200;
+}
+
+.glow-btn {
+  @apply relative overflow-hidden transition-all duration-200 active:scale-[0.99] rounded-none;
+}
+
+/* The M Tricolor stripe background */
+.m-stripe {
+  background: linear-gradient(
+    to right, 
+    #0066b1 0%, 
+    #0066b1 33.3%, 
+    #1c69d4 33.3%, 
+    #1c69d4 66.6%, 
+    #e22718 66.6%, 
+    #e22718 100%
+  );
+}
+
+/* Buttons in the BMW-M Industrial Precision System */
+.bmw-btn-primary {
+  @apply bg-canvas text-ink border border-ink py-3 px-6 uppercase text-xs font-bold tracking-[1.5px] rounded-none transition-all duration-200 hover:bg-ink hover:text-canvas cursor-pointer active:scale-95;
+}
+
+.bmw-btn-secondary {
+  @apply bg-surface-card text-ink border border-hairline py-3 px-6 uppercase text-xs font-bold tracking-[1.5px] rounded-none transition-all duration-200 hover:bg-canvas hover:border-ink cursor-pointer active:scale-95;
+}
+
+/* Inputs fields */
+.bmw-input {
+  @apply bg-surface-card text-ink border border-hairline py-3 px-4 rounded-none outline-none text-sm transition-all duration-200 focus:border-ink focus:bg-surface-elevated;
+}
+
+/* Text selections & links */
+.bmw-link {
+  @apply text-ink font-bold uppercase text-[10px] tracking-[1.5px] hover:text-m-blue-dark transition-colors inline-flex items-center gap-1;
+}
+
+/* Gradient Texts */
+.gradient-text-cyan {
+  @apply bg-gradient-to-r from-ink to-body bg-clip-text text-transparent font-extrabold;
+}
+
+/* Animation Utilities */
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.glow-pulse {
+  animation: pulseGlow 3s ease-in-out infinite;
+}

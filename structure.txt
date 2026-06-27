@@ -1,0 +1,721 @@
+
+================================================================================
+            SOUM AI COMPANION  ·  CODEBASE STRUCTURE & DEVELOPER GUIDE
+            "Everything a developer needs to understand, set up, and extend."
+================================================================================
+
+This document covers the complete folder layout of SOUM AI Companion, what each file
+does, how the architecture connects, and how to run the application locally.
+
+================================================================================
+CONTENTS
+================================================================================
+
+  SECTION 1  —  Architecture Overview
+  SECTION 2  —  Complete Folder Structure (annotated)
+  SECTION 3  —  Backend Deep Dive (agents, routes, services)
+  SECTION 4  —  Frontend Deep Dive (pages, components, services)
+  SECTION 5  —  Full API Route Reference
+  SECTION 6  —  Data Models (db.json schema)
+  SECTION 7  —  Local Setup Guide (step by step)
+  SECTION 8  —  Environment Variables Reference
+  SECTION 9  —  Running in Different Modes
+
+================================================================================
+SECTION 1  —  ARCHITECTURE OVERVIEW
+================================================================================
+
+SOUM AI Companion is a fullstack monorepo with two independent applications that
+communicate via HTTP REST APIs:
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │                                                                         │
+  │   FRONTEND  (React + TypeScript + Vite)                                 │
+  │   Port: 5173   Directory: vibe2ship/src/                                │
+  │   Styled with: Tailwind CSS (v3)                                        │
+  │   Auth: Firebase Web SDK (client-side) with local-storage guest mode    │
+  │                                                                         │
+  │         ↕  REST API calls (proxied by Vite to port 5000)               │
+  │                                                                         │
+  │   BACKEND  (Node.js + Express.js — ESM modules)                         │
+  │   Port: 5000   Directory: vibe2ship/server/                             │
+  │   Auth: Firebase Admin SDK (verifies Bearer tokens)                     │
+  │   DB:   Firebase Firestore  OR  server/data/db.json (auto-fallback)     │
+  │   AI:   Google Gemini API   OR  hardcoded mock responses (auto-fallback)│
+  │                                                                         │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+KEY DESIGN DECISIONS:
+  1. Dual persistence: the backend transparently switches between Firestore and
+     a local db.json file. No code change needed — set env vars to toggle.
+  2. Dual AI mode: if GEMINI_API_KEY is missing, all agents return realistic
+     mock data. Every feature remains functional offline.
+  3. Vite proxy: all /api/* requests from the frontend are proxied to :5000,
+     eliminating CORS issues entirely. Configured in vite.config.ts.
+  4. ESM-only backend: server uses "type": "module" so all imports use ES
+     module syntax. No CommonJS require() calls.
+  5. nodemon.json: ignores server/data/** to prevent infinite restarts when
+     db.json is written during request handling.
+
+================================================================================
+SECTION 2  —  COMPLETE FOLDER STRUCTURE
+================================================================================
+
+vibe2ship/                              ← Root (frontend + config)
+│
+├── server/                             ← Express Backend Application
+│   │
+│   ├── agents/                         ← 8 Independent AI Agent Modules
+│   │   ├── plannerAgent.js             ← Breaks tasks into 3–6 subtasks
+│   │   ├── priorityAgent.js            ← Assigns High/Medium/Low + reason
+│   │   ├── schedulerAgent.js           ← Maps tasks to Morning/Afternoon/Evening
+│   │   ├── reminderAgent.js            ← Writes urgency messages + start times
+│   │   ├── reflectionAgent.js          ← Computes productivity score + insights
+│   │   ├── motivationAgent.js          ← Generates streak-based encouragement
+│   │   ├── recoveryAgent.js            ← Rebuilds overdue tasks [NEW]
+│   │   └── rescueAgent.js              ← Stress analysis + rescue plan [NEW]
+│   │
+│   ├── routes/                         ← Express Route Handlers
+│   │   ├── tasks.js                    ← CRUD endpoints + agent pipeline
+│   │   ├── ai.js                       ← Chat + daily plan + prioritize
+│   │   ├── analytics.js                ← Reflection + motivation data
+│   │   ├── focus.js                    ← Pomodoro stats + schedule [NEW]
+│   │   ├── recovery.js                 ← Recovery Engine endpoints [NEW]
+│   │   └── rescue.js                   ← Rescue analysis + memory [NEW]
+│   │
+│   ├── services/                       ← Third-Party Service Wrappers
+│   │   ├── firebase.js                 ← DB abstraction (Firestore / db.json)
+│   │   ├── gemini.js                   ← Gemini API client + mock fallback
+│   │   └── userMemory.js               ← Cognitive profile tracker [NEW]
+│   │
+│   ├── data/                           ← Auto-created local database
+│   │   └── db.json                     ← Persistent JSON store (auto-created)
+│   │
+│   ├── .env                            ← Secret keys (not committed to git)
+│   ├── nodemon.json                    ← Ignores data/** to prevent restart loops
+│   ├── package.json                    ← Backend dependencies + npm scripts
+│   └── index.js                        ← Express entry point (port 5000)
+│
+├── src/                                ← React Frontend (TypeScript)
+│   │
+│   ├── components/                     ← Reusable UI Components
+│   │   ├── Navigation.tsx              ← Sidebar + mobile drawer + header
+│   │   ├── CrisisBanner.tsx            ← Deadline < 2h emergency alert [NEW]
+│   │   ├── RescueCard.tsx              ← Stress level + rescue plan card [NEW]
+│   │   ├── FocusTimer.tsx              ← Pomodoro SVG ring timer [NEW]
+│   │   └── ProductivityMemoryCard.tsx  ← Cognitive profile display card [NEW]
+│   │
+│   ├── pages/                          ← Full-Page Views
+│   │   ├── LandingPage.tsx             ← Welcome screen + Quick Guest Mode
+│   │   ├── Dashboard.tsx               ← Command centre (agents, schedule, quick-add)
+│   │   ├── TaskManagement.tsx          ← Task list, filters, inspector panel
+│   │   ├── FocusSession.tsx            ← Pomodoro focus mode [NEW]
+│   │   ├── AIChat.tsx                  ← Natural language task extraction chat
+│   │   ├── CalendarView.tsx            ← Monthly deadline calendar grid
+│   │   ├── Analytics.tsx               ← Charts, reflection, rescue, memory
+│   │   └── Settings.tsx                ← Work hours + system diagnostics
+│   │
+│   ├── services/                       ← Frontend Service Layer
+│   │   ├── firebase.ts                 ← Auth SDK (Web) + local guest fallback
+│   │   └── api.ts                      ← Typed REST client for all backend calls
+│   │
+│   ├── App.tsx                         ← Root component: auth guard + page router
+│   ├── index.css                       ← Global styles (BMW M Motorsport design)
+│   └── main.tsx                        ← ReactDOM.render() entry point
+│
+├── public/                             ← Static assets (favicons, etc.)
+├── dist/                               ← Production build output (npm run build)
+├── design.md                           ← Design system reference (BMW M rules)
+├── USER_GUIDE.txt                      ← Complete end-user documentation
+├── structure.txt                       ← This file
+├── README.md                           ← Project overview + quick start
+├── index.html                          ← Vite HTML entry point
+├── vite.config.ts                      ← Vite config (proxy, aliases)
+├── tsconfig.json                       ← TypeScript config (references)
+├── tsconfig.app.json                   ← App TypeScript settings
+├── tsconfig.node.json                  ← Node (Vite) TypeScript settings
+├── eslint.config.js                    ← ESLint rules
+└── package.json                        ← Frontend dependencies + scripts
+
+================================================================================
+SECTION 3  —  BACKEND DEEP DIVE
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+server/index.js  —  Entry Point
+────────────────────────────────────────────────────────────────────────────────
+• Creates the Express app.
+• Applies CORS and JSON body parsing middleware.
+• Imports and mounts all route modules:
+    /api/tasks        → tasksRouter
+    /api/ai           → aiRouter
+    /api/analytics    → analyticsRouter  (also extended by rescueRouter)
+    /api/focus        → focusRouter
+    /api/recovery     → recoveryRouter
+    /api/analytics    → rescueRouter     (adds /rescue and /memory sub-paths)
+    /api/health       → inline healthcheck
+• Binds to 127.0.0.1:5000.
+
+────────────────────────────────────────────────────────────────────────────────
+server/services/firebase.js  —  Persistence Abstraction
+────────────────────────────────────────────────────────────────────────────────
+Exports a unified dbService object with these methods:
+  dbService.getTasks(userId)
+  dbService.createTask(userId, taskData)
+  dbService.updateTask(userId, taskId, updates)
+  dbService.deleteTask(userId, taskId)
+  dbService.getUser(userId)
+  dbService.updateUser(userId, updates)
+  dbService.getAnalytics(userId)
+  dbService.updateAnalytics(userId, updates)
+
+• If FIREBASE_* env vars are set → uses Firestore.
+• Otherwise → reads and writes server/data/db.json (created on first run).
+• Also exports authMiddleware: verifies Firebase Bearer token OR accepts the
+  hardcoded guest token "guest-token-local" for local testing.
+
+────────────────────────────────────────────────────────────────────────────────
+server/services/gemini.js  —  AI Client
+────────────────────────────────────────────────────────────────────────────────
+Exports callGemini(systemInstruction, userPrompt):
+• If GEMINI_API_KEY is present → calls Gemini (gemini-2.5-flash or 1.5-flash).
+• If key is missing → returns a hardcoded mock response specific to the agent
+  type (detected from the system instruction string).
+• Parses JSON from the model's text response automatically.
+• Logs all agent calls for debugging.
+
+────────────────────────────────────────────────────────────────────────────────
+server/services/userMemory.js  —  Cognitive Profile Tracker  [NEW]
+────────────────────────────────────────────────────────────────────────────────
+Exports updateMemoryOnTaskCompletion(userId, completedTask):
+• Called automatically by tasks.js on every task completion.
+• Reads the current user record from the DB.
+• Updates the user.memory object with:
+    preferredStudyTime    — Morning / Afternoon / Evening (by completion hour)
+    averageCompletionRate — running percentage of on-time completions
+    productiveHours       — specific hours with the most completions
+    procrastinationPattern— string description of delay patterns
+    strongestCategory     — category with the highest completion rate
+    weakestCategory       — category with the lowest completion rate
+    averageTaskDuration   — mean estimated effort of completed tasks
+    streakHistory         — array of last N streak values
+• Saves the updated memory object back to the DB.
+
+────────────────────────────────────────────────────────────────────────────────
+AGENT MODULES  (server/agents/)
+────────────────────────────────────────────────────────────────────────────────
+
+All agents follow the same pattern:
+  1. Export a named object with a descriptive name property.
+  2. Expose one or more async methods that accept task/context data.
+  3. Build a systemInstruction string and a userPrompt string.
+  4. Call callGemini(systemInstruction, userPrompt).
+  5. Return a parsed object. Provide a robust fallback if Gemini fails.
+
+plannerAgent.js
+  PlannerAgent.planTask(task)
+  → Returns { subtasks: [{title, durationMinutes, order, completed}] }
+
+priorityAgent.js
+  PriorityAgent.assignPriority(task, allTasks)
+  → Returns { priority: "High"|"Medium"|"Low", reason, urgencyScore }
+
+schedulerAgent.js
+  SchedulerAgent.generateDailyPlan(tasks, userPreferences)
+  → Returns { morningPlan, afternoonPlan, eveningPlan,
+              recommendedStudySessions, rearrangementSuggestion }
+
+reminderAgent.js
+  ReminderAgent.generateReminder(task)
+  → Returns { nudge, urgency, recommendedStartTime, action }
+
+reflectionAgent.js
+  ReflectionAgent.analyze(tasks, user)
+  → Returns { productivityScore, weeklyTrend, insights, suggestions }
+
+motivationAgent.js
+  MotivationAgent.motivate(user, tasks)
+  → Returns { quote, advice }
+
+recoveryAgent.js  [NEW]
+  RecoveryAgent.recoverTask(task, userPreferences)
+  → Returns { status, newPriority, newSuggestedDeadline, newScheduleBlock,
+              message, recoverySteps }
+
+  RecoveryAgent.scanAndRecover(tasks, userPreferences)
+  → Filters overdue tasks, calls recoverTask() for each one.
+  → Returns { recoveries: [{task, recovery}], message }
+
+rescueAgent.js  [NEW]
+  RescueAgent.analyzeStress({ missedTasks, pendingTasks, streak, userMemory })
+  → Returns { stressLevel, recoveryProbability, crisisMode,
+              recommendations, imminentTasks }
+
+────────────────────────────────────────────────────────────────────────────────
+ROUTE MODULES  (server/routes/)
+────────────────────────────────────────────────────────────────────────────────
+
+tasks.js
+  GET    /api/tasks           — List all tasks for the authenticated user.
+  POST   /api/tasks           — Create task → runs Planner, Priority, Reminder.
+  PUT    /api/tasks/:id       — Update task. If status→"completed":
+                                • updates streak + weekly count
+                                • updates analytics history
+                                • calls updateMemoryOnTaskCompletion()
+  DELETE /api/tasks/:id       — Delete a task permanently.
+
+ai.js
+  POST   /api/ai/chat         — Chat with the AI assistant. Extracts tasks from
+                                natural language. Returns response + detectedTasks.
+  POST   /api/ai/plan         — Runs Scheduler Agent on all pending tasks.
+                                Returns daily time blocks.
+  POST   /api/ai/prioritize   — Re-runs Priority Agent on every pending task.
+                                Returns updated task list.
+
+analytics.js
+  GET    /api/analytics       — Returns streak, counts, reflection score,
+                                weekly trend, motivation quote, and advice.
+
+focus.js  [NEW]
+  GET    /api/focus/stats             — Returns focusStats from user record:
+                                        totalFocusMinutes, deepWorkHours,
+                                        sessionsCompleted, dailyFocusStreak,
+                                        weeklyFocusStreak, lastFocusDate.
+  POST   /api/focus/session/complete  — Records a completed Pomodoro session.
+                                        Body: { durationMinutes: number }
+                                        Updates stats and streak logic.
+  POST   /api/focus/schedule          — Generates Pomodoro blocks using the
+                                        Scheduler Agent.
+                                        Body: { taskId?: string }
+                                        Returns pomodoroSessions array.
+
+recovery.js  [NEW]
+  GET    /api/recovery/status  — Returns overdue task count + list. Lightweight,
+                                 no agent calls. Used to check if recovery needed.
+  POST   /api/recovery/check   — Runs RecoveryAgent.scanAndRecover(). Writes
+                                 updated priority + plan back to each task in DB.
+                                 Returns { recoveredCount, recoveries }.
+
+rescue.js  [NEW]
+  GET    /api/analytics/rescue  — Runs RescueAgent.analyzeStress() with live data.
+                                  Returns { stressLevel, recoveryProbability,
+                                  crisisMode, recommendations, imminentTasks }.
+  GET    /api/analytics/memory  — Returns user.memory (cognitive profile object).
+                                  Returns default placeholder values if no data yet.
+
+================================================================================
+SECTION 4  —  FRONTEND DEEP DIVE
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+src/services/api.ts  —  REST Client
+────────────────────────────────────────────────────────────────────────────────
+All backend calls go through this single file. Each method:
+  • Reads the current auth token via authService.getToken().
+  • Sends Authorization: Bearer <token> with every request.
+  • Throws an Error with the server's error message on non-2xx responses.
+
+Methods:
+  api.getTasks()
+  api.createTask(taskData)
+  api.updateTask(taskId, updates)
+  api.deleteTask(taskId)
+  api.sendChatMessage(message)
+  api.generateDailyPlan()
+  api.prioritizeTasks()
+  api.getAnalytics()
+  api.getRescueAnalysis()       [NEW]
+  api.getRecoveryStatus()       [NEW]
+  api.runRecoveryCheck()        [NEW]
+  api.getFocusStats()           [NEW]
+  api.completeFocusSession(durationMinutes)  [NEW]
+  api.getFocusSchedule(taskId?) [NEW]
+  api.getMemoryProfile()        [NEW]
+
+TypeScript interfaces exported:
+  Task · Subtask · AnalyticsData · ChatResponse · TimeBlock ·
+  SchedulerResponse · RescueData · RecoveryResult · RecoveryStatus ·
+  FocusStats · PomodoroSession · FocusScheduleResponse · UserMemory
+
+────────────────────────────────────────────────────────────────────────────────
+src/services/firebase.ts  —  Auth Service
+────────────────────────────────────────────────────────────────────────────────
+• Initialises Firebase Web SDK (if config env vars are present).
+• authService.getToken(): returns Firebase ID token or "guest-token-local".
+• Guest mode: stores a fake user object in localStorage under "lifesaver_guest".
+
+────────────────────────────────────────────────────────────────────────────────
+src/App.tsx  —  Page Router
+────────────────────────────────────────────────────────────────────────────────
+• Checks auth state on mount.
+• If not authenticated → renders LandingPage.
+• If authenticated → renders Navigation + the active page component.
+• Active page is tracked in activePage state (string).
+• Pages: dashboard · tasks · focus · chat · calendar · analytics · settings
+
+────────────────────────────────────────────────────────────────────────────────
+COMPONENT: Navigation.tsx
+────────────────────────────────────────────────────────────────────────────────
+• Desktop: renders a fixed left sidebar with icon + label items.
+• Mobile: renders a hamburger button → slide-out drawer.
+• Menu items:
+    Dashboard · Task Manager · Focus Session · AI Assistant ·
+    Calendar View · Analytics Insights · Settings
+• Bottom: shows user display name + Logout button.
+
+────────────────────────────────────────────────────────────────────────────────
+COMPONENT: CrisisBanner.tsx  [NEW]
+────────────────────────────────────────────────────────────────────────────────
+Props: { tasks: Task[] }
+• Filters tasks where deadline < 2 hours from now and not completed.
+• For each: calculates time remaining, generates an Emergency Plan.
+  Emergency Plan logic:
+    — If task has remaining (unchecked) subtasks → uses their titles + durations.
+    — Otherwise → generates a 2-block generic plan (core work + final review).
+• Renders a glowing red bordered card per crisis task.
+• Uses setInterval(60s) to re-calculate countdowns without a page refresh.
+• Dismissed tasks stored in a local Set<string> state (session-only).
+
+────────────────────────────────────────────────────────────────────────────────
+COMPONENT: RescueCard.tsx  [NEW]
+────────────────────────────────────────────────────────────────────────────────
+Props: { data: RescueData | null, loading?: boolean }
+• Renders loading spinner while data is fetched.
+• Shows stress level as a colour-coded bar (white/amber/red).
+• Shows recovery probability as a percentage + fill bar.
+• Lists imminent tasks in a red warning block (if any).
+• Lists recommendations as a numbered checklist.
+• Shows "CRISIS MODE ACTIVE" pulsing badge if data.crisisMode is true.
+
+────────────────────────────────────────────────────────────────────────────────
+COMPONENT: FocusTimer.tsx  [NEW]
+────────────────────────────────────────────────────────────────────────────────
+Props: { sessions?: PomodoroSession[], onSessionComplete?: (mins) => void }
+State: phase (idle|work|break|done), secondsLeft, isRunning, currentSessionIdx,
+       completedCount
+• Uses setInterval inside a useEffect to tick every second.
+• SVG circle uses strokeDashoffset to animate the progress ring.
+• Ring colour: white during work → green during break/done.
+• On work phase end: calls api.completeFocusSession(50) and onSessionComplete().
+• Handles multi-session arrays: advances index after each break.
+
+────────────────────────────────────────────────────────────────────────────────
+COMPONENT: ProductivityMemoryCard.tsx  [NEW]
+────────────────────────────────────────────────────────────────────────────────
+Props: { memory: UserMemory | null, loading?: boolean }
+• Renders loading spinner while data is fetched.
+• Shows 5-column metric grid.
+• Renders procrastination pattern text.
+• Renders peak productive hours as tag chips.
+• Renders streak history as a proportional bar sparkline.
+• Falls back to placeholder strings/zeroes if memory is null.
+
+────────────────────────────────────────────────────────────────────────────────
+PAGE: Dashboard.tsx
+────────────────────────────────────────────────────────────────────────────────
+API calls on mount (parallel):
+  api.getTasks(), api.generateDailyPlan(), api.getAnalytics()
+State: tasks, schedule, analytics, loading, actionLoading, error,
+       recoveryLoading, recoveryMsg
+Features added:
+  • handleRecoveryCheck(): calls api.runRecoveryCheck() → shows result message.
+  • "Auto-Recover" button in header (next to Sync Agents).
+  • <CrisisBanner tasks={tasks} /> rendered below error block.
+
+────────────────────────────────────────────────────────────────────────────────
+PAGE: FocusSession.tsx  [NEW]
+────────────────────────────────────────────────────────────────────────────────
+API calls on mount (sequential):
+  api.getTasks() → api.getFocusStats() → api.getFocusSchedule()
+State: tasks, selectedTaskId, focusStats, focusSchedule, loading,
+       scheduleLoading, error
+Features:
+  • Task dropdown: onChange calls api.getFocusSchedule(taskId).
+  • Left panel: lists pomodoroSessions from focusSchedule.
+  • Right panel: renders <FocusTimer sessions={...} onSessionComplete={...} />
+  • onSessionComplete: calls api.getFocusStats() to refresh stat boxes.
+  • 5 stats panels: Total Focus · Deep Work · Sessions · Daily Streak · Weekly Streak.
+
+────────────────────────────────────────────────────────────────────────────────
+PAGE: Analytics.tsx
+────────────────────────────────────────────────────────────────────────────────
+API calls on mount:
+  api.getAnalytics() [blocking]
+  → then in parallel (non-blocking):
+       api.getRescueAnalysis() · api.getFocusStats() · api.getMemoryProfile()
+State: analytics, rescueData, focusStats, userMemory, loading, rescueLoading, error
+New sections appended below existing content:
+  • Focus Engine: Session Metrics row (5 stat boxes).
+  • <RescueCard data={rescueData} loading={rescueLoading} />
+  • <ProductivityMemoryCard memory={userMemory} loading={rescueLoading} />
+
+================================================================================
+SECTION 5  —  FULL API ROUTE REFERENCE
+================================================================================
+
+All routes (except /api/health) require Authorization: Bearer <token>
+
+  METHOD  PATH                           AUTH  DESCRIPTION
+  ──────  ─────────────────────────────  ────  ─────────────────────────────────
+  GET     /api/health                    No    Server health check
+  GET     /api/tasks                     Yes   List all user tasks
+  POST    /api/tasks                     Yes   Create task (triggers 3 agents)
+  PUT     /api/tasks/:id                 Yes   Update task; completion triggers
+                                               streak + memory + analytics
+  POST    /api/tasks/:id/regenerate-plan Yes   Regenerate subtask plan via Planner Agent [NEW]
+  DELETE  /api/tasks/:id                 Yes   Delete a task permanently
+  POST    /api/ai/chat                   Yes   Chat + natural language task parse
+  POST    /api/ai/plan                   Yes   Generate Scheduler time blocks
+  POST    /api/ai/prioritize             Yes   Re-run Priority Agent on all tasks
+  GET     /api/analytics                 Yes   Streak, reflection, motivation data
+  GET     /api/analytics/rescue          Yes   Rescue Agent stress analysis [NEW]
+  GET     /api/analytics/memory          Yes   Cognitive memory profile [NEW]
+  GET     /api/recovery/status           Yes   Overdue task count (no agent) [NEW]
+  POST    /api/recovery/check            Yes   Run Recovery Agent [NEW]
+  GET     /api/focus/stats               Yes   Pomodoro session statistics [NEW]
+  POST    /api/focus/session/complete    Yes   Record completed session [NEW]
+  POST    /api/focus/schedule            Yes   Generate Pomodoro blocks [NEW]
+
+================================================================================
+SECTION 6  —  DATA MODELS (db.json schema)
+================================================================================
+
+The db.json file is structured as follows:
+
+{
+  "users": {
+    "<userId>": {
+      "displayName": string,
+      "email": string,
+      "streak": number,
+      "lastCompletedDate": "YYYY-MM-DD" | null,
+      "weeklyCompleted": number,
+      "workingHours": { "start": "09:00", "end": "17:00" },
+      "focusStats": {
+        "totalFocusMinutes": number,
+        "deepWorkHours": number,
+        "dailyFocusStreak": number,
+        "weeklyFocusStreak": number,
+        "sessionsCompleted": number,
+        "lastFocusDate": "YYYY-MM-DD" | null
+      },
+      "memory": {
+        "preferredStudyTime": string,
+        "averageCompletionRate": number,
+        "productiveHours": string[],
+        "procrastinationPattern": string,
+        "strongestCategory": string,
+        "weakestCategory": string,
+        "averageTaskDuration": number,
+        "streakHistory": number[]
+      }
+    }
+  },
+  "tasks": {
+    "<userId>": [
+      {
+        "id": string,
+        "title": string,
+        "description": string,
+        "deadline": "YYYY-MM-DD" | null,
+        "status": "pending" | "completed" | "overdue",
+        "priority": "High" | "Medium" | "Low",
+        "category": string,
+        "urgency": "critical" | "important" | "medium" | "normal", [NEW]
+        "notes": string, [NEW]
+        "importance": number,
+        "estimatedEffort": number,
+        "subtasks": [
+          { "title": string, "durationMinutes": number, "order": number,
+            "completed": boolean }
+        ],
+        "suggestedExecutionFlow": string,
+        "reminderNudge": string,
+        "reminderUrgency": "normal" | "urgent" | "critical",
+        "reminderAction": string,
+        "recoveryStatus": string | undefined,
+        "recoveryMessage": string | undefined,
+        "recoverySteps": string[] | undefined,
+        "suggestedDeadline": string | undefined,
+        "suggestedScheduleBlock": string | undefined,
+        "createdAt": ISO8601 string,
+        "updatedAt": ISO8601 string
+      }
+    ]
+  },
+  "analytics": {
+    "<userId>": {
+      "history": [
+        { "date": "YYYY-MM-DD", "completed": number, "missed": number }
+      ]
+    }
+  }
+}
+
+================================================================================
+SECTION 7  —  LOCAL SETUP GUIDE
+================================================================================
+
+Follow these steps exactly to run SOUM AI Companion on your machine.
+
+────────────────────────────────────────────────────────────────────────────────
+PREREQUISITES
+────────────────────────────────────────────────────────────────────────────────
+• Node.js v18 or newer  →  https://nodejs.org/
+• npm (included with Node.js)
+• A text editor (VS Code recommended)
+• Optional: A Google Gemini API key (the app works without one in Mock Mode)
+
+Verify your Node installation:
+  node -v    # should print v18.x.x or higher
+  npm -v     # should print 9.x or higher
+
+────────────────────────────────────────────────────────────────────────────────
+STEP 1  —  Clone / Download the project
+────────────────────────────────────────────────────────────────────────────────
+If using Git:
+  git clone <repository-url>
+  cd vibe2ship
+
+If downloaded as a ZIP:
+  Extract the ZIP and open the vibe2ship folder.
+
+────────────────────────────────────────────────────────────────────────────────
+STEP 2  —  Install backend dependencies
+────────────────────────────────────────────────────────────────────────────────
+  cd server
+  npm install
+
+You should see packages being downloaded. Wait for it to finish.
+
+────────────────────────────────────────────────────────────────────────────────
+STEP 3  —  Configure backend environment variables
+────────────────────────────────────────────────────────────────────────────────
+Inside the server/ folder, create a file called ".env" (note the leading dot):
+
+  Windows PowerShell:  New-Item .env
+  Windows CMD:         type nul > .env
+  Mac / Linux:         touch .env
+
+Open .env in your text editor and add:
+
+  PORT=5000
+  GEMINI_API_KEY=your_gemini_api_key_here
+
+NOTES:
+  • If you leave GEMINI_API_KEY blank or missing, the server runs in
+    "Mock Agent Mode" — all features work with realistic dummy responses.
+  • If you want real Firebase, also add (all from your Firebase project settings):
+      FIREBASE_PROJECT_ID=your-project-id
+      FIREBASE_CLIENT_EMAIL=your-service-account-email
+      FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n..."
+    Without these, data is stored in server/data/db.json automatically.
+
+────────────────────────────────────────────────────────────────────────────────
+STEP 4  —  Start the backend server
+────────────────────────────────────────────────────────────────────────────────
+  # From the server/ directory:
+  npm run dev
+
+You should see:
+
+  [nodemon] starting `node index.js`
+  Firebase credentials not set. Running in LOCAL PERSISTENT MODE using db.json.
+  GEMINI_API_KEY not found. Running in MOCK AGENT MODE.
+  =================================================
+   SOUM AI Companion Multi-Agent Backend Server running
+   Port: 5000
+   URL: http://127.0.0.1:5000
+  =================================================
+
+Leave this terminal open and running.
+
+────────────────────────────────────────────────────────────────────────────────
+STEP 5  —  Install frontend dependencies
+────────────────────────────────────────────────────────────────────────────────
+Open a NEW terminal window (keep the backend running in the first one).
+
+  # Navigate to the project root (one level above server/):
+  cd d:\projects\vibe2ship    # adjust path to match your system
+  npm install
+
+────────────────────────────────────────────────────────────────────────────────
+STEP 6  —  Start the frontend dev server
+────────────────────────────────────────────────────────────────────────────────
+  # From the project root:
+  npm run dev
+
+You should see:
+
+  VITE v8.0.16  ready in Xms
+  ➜  Local: http://127.0.0.1:5173/
+
+Leave this terminal open too.
+
+────────────────────────────────────────────────────────────────────────────────
+STEP 7  —  Open the app
+────────────────────────────────────────────────────────────────────────────────
+1. Open any modern browser (Chrome / Edge / Firefox).
+2. Navigate to:  http://127.0.0.1:5173
+3. Click "Quick Guest Mode" on the landing page.
+4. You are inside the app. Start adding tasks!
+
+────────────────────────────────────────────────────────────────────────────────
+STOPPING THE SERVERS
+────────────────────────────────────────────────────────────────────────────────
+• In each terminal, press Ctrl + C to stop the process.
+• Data persists in server/data/db.json even after stopping.
+
+RESTARTING AFTER A STOP:
+• Backend: cd server && npm run dev
+• Frontend: npm run dev (from root)
+• If port 5000 is already in use (EADDRINUSE error):
+    Windows: netstat -aon | findstr :5000
+             taskkill /F /PID <pid-shown>
+    Mac/Linux: lsof -i :5000 && kill -9 <pid>
+
+================================================================================
+SECTION 8  —  ENVIRONMENT VARIABLES REFERENCE
+================================================================================
+
+File location: server/.env
+
+  VARIABLE                  REQUIRED  DEFAULT   DESCRIPTION
+  ─────────────────────────────────────────────────────────────────────────────
+  PORT                      No        5000      Port for the Express server
+  GEMINI_API_KEY            No        (empty)   Google AI Studio API key.
+                                                If blank → Mock Agent Mode.
+  FIREBASE_PROJECT_ID       No        (empty)   Firebase project identifier.
+                                                If blank → db.json mode.
+  FIREBASE_CLIENT_EMAIL     No        (empty)   Service account email.
+  FIREBASE_PRIVATE_KEY      No        (empty)   Service account private key.
+                                                Include full PEM with \n chars.
+
+================================================================================
+SECTION 9  —  RUNNING IN DIFFERENT MODES
+================================================================================
+
+MODE A  —  Full Production (Gemini AI + Firebase)
+  Requirements: All 5 env vars set in server/.env
+  Behaviour:    Real AI responses. Data stored in Firestore. Auth via Firebase.
+  Use for:      Deployed production environment.
+
+MODE B  —  AI Only (Gemini AI + Local DB)
+  Requirements: GEMINI_API_KEY set. Firebase vars blank.
+  Behaviour:    Real AI responses. Data stored in db.json. Guest auth works.
+  Use for:      Local development with real AI responses.
+
+MODE C  —  Fully Offline / Emulator (Mock AI + Local DB)  ← DEFAULT
+  Requirements: No env vars needed (just PORT is optional).
+  Behaviour:    All agents return realistic mock responses. Data in db.json.
+                Starts automatically when no API key or Firebase config is found.
+  Use for:      Development, testing, demos, or environments with no internet.
+
+MODE D  —  Firebase Auth + Local AI (Mock AI + Firebase)
+  Requirements: Firebase vars set. GEMINI_API_KEY blank.
+  Behaviour:    Real Firebase auth and Firestore. Mock agent responses.
+  Use for:      Testing Firebase integration without spending Gemini quota.
+
+================================================================================
+End of structure.txt
+================================================================================
