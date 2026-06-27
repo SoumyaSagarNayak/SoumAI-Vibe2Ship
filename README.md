@@ -1,241 +1,111 @@
-# SOUM AI Companion — Multi-Agent Productivity Companion
+# 🌟 SOUM AI Companion — Multi-Agent Productivity Canvas
 
-> **SOUM AI Companion** is an agentic productivity system that proactively plans, schedules, monitors, and recovers your tasks using a network of 8 independent AI agents — so you never miss a deadline again.
+<div align="center">
 
-Unlike passive to-do apps, SOUM AI Companion runs agents automatically in the background every time you interact with a task. It can detect crises before they happen, rebuild missed tasks, analyse your stress level, and coach you through deep work sessions — all in real time.
+![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Express](https://img.shields.io/badge/Express.js-Node-000000?style=for-the-badge&logo=express&logoColor=white)
+![Google Gemini](https://img.shields.io/badge/Google_Gemini-2.5_Flash-F4B400?style=for-the-badge&logo=google&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-SDK_/_Auth-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+![Render](https://img.shields.io/badge/Render-Live-46E3B7?style=for-the-badge&logo=render&logoColor=black)
 
----
+**An intelligent, multi-agent cognitive productivity center that proactively schedules, tracks, recovers, and guides your deep work sessions.**
 
-## 📖 Documentation
-
-| File | Description |
-|---|---|
-| [USER_GUIDE.txt](./USER_GUIDE.txt) | Complete end-user manual — every page, every button, every feature explained in plain English. Includes pro tips, daily routines, and FAQs. |
-| [structure.txt](./structure.txt) | Developer reference — full folder structure, backend/frontend architecture, API route table, data schema, and step-by-step local setup guide. |
-| [design.md](./design.md) | Design system reference — BMW M Motorsport design rules, colour tokens, typography, spacing, and component patterns. |
-
----
-
-## 🤖 The 8 Intelligent Agents
-
-| # | Agent | What It Does |
-|---|---|---|
-| 1 | **Planner Agent** | Breaks a task into 3–6 ordered subtasks with time estimates |
-| 2 | **Priority Agent** | Assigns High / Medium / Low + a reason why |
-| 3 | **Scheduler Agent** | Maps tasks to Morning / Afternoon / Evening blocks |
-| 4 | **Reminder Agent** | Writes a precise "start by X time" urgency alert per task |
-| 5 | **Reflection Agent** | Generates a weekly Productivity Score (0–100) + habit insights |
-| 6 | **Motivation Agent** | Produces streak-based encouragement quotes and advice |
-| 7 | **Recovery Agent** 🆕 | Rebuilds overdue tasks with new deadlines, plans, and priorities |
-| 8 | **Rescue Agent** 🆕 | Analyses full workload stress and produces a ranked rescue plan |
+[📖 End-User Manual](./USER_GUIDE.txt) • [🛠️ Developer Reference](./structure.txt) • [🎨 Design Tokens Reference](./design.md)
+</div>
 
 ---
 
-## ✨ Feature Highlights
+## 🤖 Meet the 8 Intelligent Background Agents
 
-### Original Features
-- **Planner, Priority, Scheduler, Reminder, Reflection, Motivation** agents run automatically on every task.
-- **Conversational AI Chat** — describe your week in plain English, the AI extracts and schedules all tasks.
-- **Calendar Grid** — monthly view of all deadlines; overdue items glow red.
-- **Analytics Dashboard** — completion rings, weekly bar chart, productivity score, motivation quote.
-- **Firebase + Local DB** — transparent dual persistence (Firestore or db.json, auto-detected).
-- **Guest Mode** — one-click access, no sign-up required, data persists locally.
+Whenever you interact with a task, a background pipeline of independent AI agents coordinates to analyze, restructure, and schedule your work in real-time.
 
-### New Features 🆕
-- **Auto-Recovery Engine** — one click rebuilds all overdue tasks with new AI-generated plans.
-- **Rescue Agent** — stress level (Low/Medium/High), recovery probability %, and ranked rescue steps.
-- **Crisis Mode Banner** — real-time countdown alert for deadlines under 2 hours with an emergency plan.
-- **Focus Session Engine** — Pomodoro timer (50 min work / 10 min break) with AI-generated session schedules.
-- **Memory Intelligence** — builds a Cognitive Profile from your task completion patterns over time.
-- **Focus Analytics** — tracks total focus hours, deep work hours, session count, daily/weekly streaks.
-- **Offline Caching & Local Storage** — complete offline fallback; instantly caches tasks, calendar items, focus statistics, and analytics to local storage when server is unreachable.
-- **Routine Tasks Generator** — registers daily recurring templates (e.g. Gym, DSA, Development pre-populated) and spawns checkable checklist instances on designated days.
-- **Calendar Recurrence Mapping** — displays recurring templates visually as mock task items on the calendar grid, color-coded and marked as complete/pending dynamically.
+| Agent | Icon | Role | Output Details |
+| :--- | :---: | :--- | :--- |
+| **Planner Agent** | 📝 | Task Decomposition | Splits tasks into 3–6 ordered subtasks with durations. |
+| **Priority Agent** | ⚡ | Intelligent Priority | Assigns High / Medium / Low priority + logical rationale. |
+| **Scheduler Agent** | ⏰ | Daily Block Mapping | Arranges tasks into Morning / Afternoon / Evening blocks. |
+| **Reminder Agent** | 🔔 | Urgency Warnings | Computes precise "start-by" times and urgency states. |
+| **Reflection Agent** | 📊 | Analytics & Reflection | Evaluates weekly performance & provides habit diagnostics. |
+| **Motivation Agent** | 🔥 | Dynamic Coaching | Generates personalized streak-based nudges & advice. |
+| **Recovery Agent** | 🛠️ | Overdue Task Rebuilder | Suggests new deadlines, plans, and raises priority. |
+| **Rescue Agent** | 🚨 | Workload Stress Analysis | Computes stress, recovery probability, & emergency plans. |
 
 ---
 
-## 🛠️ Tech Stack
+## ⚡ Core Feature Highlights
 
-| Layer | Technology |
-|---|---|
-| Frontend | React 19, TypeScript, Tailwind CSS v3, Vite 8 |
-| Backend | Node.js, Express.js (ESM modules) |
-| AI Engine | Google Gemini API (`gemini-2.5-flash` / `gemini-1.5-flash`) |
-| Database | Firebase Firestore **or** local `db.json` (auto-fallback) |
-| Auth | Firebase Authentication **or** local guest token (auto-fallback) |
-| Design | BMW M Motorsport design language (pure black canvas, tricolor accents) |
+### 🚀 Advanced Features
+*   🤖 **Multi-Agent Orchestration**: Independent background agents execute instantly on task modifications.
+*   💬 **Conversational AI Chat**: Natural language workspace manager. Describe your workload in plain English to extract and deploy schedules instantly.
+*   📅 **Calendar Deadline Grid**: Monthly visual command tracker. Shows real-time overdue glow indicators and recurrence templates.
+*   📊 **Visual Analytics**: Interactive task dials, weekly completion trends, stress gauges, and AI reflections.
+
+### 🆕 Newly Implemented Features
+*   💾 **Local Storage Caching & Offline Fallback**: Fully functional offline fallback. Instant loads, local writes, and cache restores if the server is down.
+*   🔁 **Routine Tasks Generator**: Creates templates (Gym, DSA, Development pre-configured) and spawns daily instances on select weekdays.
+*   📅 **Calendar Recurrence Mapping**: Projects repeating templates dynamically as checkable mock tasks across future/past days.
+*   🧠 **Cognitive Work Profile**: Memory Intelligence aggregates your completion patterns to identify best hours and avoid procrastination.
+*   ⏱️ **Pomodoro Focus Session**: 50/10 timeboxing with AI scheduling recommendations and saved focus stats.
 
 ---
 
-## ⚡ Quick Start
+## 🛠️ Technology Stack
 
-### Requirements
-- [Node.js](https://nodejs.org/) v18 or newer
-- npm (included with Node.js)
+*   **Frontend**: React 19, TypeScript, Vanilla CSS (BMW M Motorsport Design Canvas), Vite 8.
+*   **Backend**: Node.js + Express.js (ESM modules).
+*   **AI Orchestration**: Google Gemini Developer API.
+*   **Database**: Dual Persistence (Firebase Firestore with auto-fallback to local `db.json`).
 
-### 1 — Backend
+---
 
+## 🚀 Local Quick Start
+
+### 1. Launch the Backend
 ```bash
 cd server
 npm install
 ```
 
-Create `server/.env`:
-
+Configure your `server/.env`:
 ```env
 PORT=5000
-GEMINI_API_KEY=your_gemini_key_here
+GEMINI_API_KEY=your_gemini_developer_key
 ```
+*(No key? Keep it blank! The application will automatically boot in **Mock Agent Mode** with realistic mock AI responses.)*
 
-> **No key?** Leave `GEMINI_API_KEY` blank. The server boots in **Mock Agent Mode** — every feature still works with realistic dummy AI responses.
-
+Run the Express server:
 ```bash
 npm run dev
-# → SOUM AI Companion Multi-Agent Backend Server running on Port 5000
 ```
 
-### 2 — Frontend
-
+### 2. Launch the Frontend
+In a new terminal window, from the root folder:
 ```bash
-# In a new terminal, from the project root:
 npm install
 npm run dev
-# → http://127.0.0.1:5173
 ```
 
-### 3 — Access
-
-Open `http://127.0.0.1:5173` in your browser → click **Quick Guest Mode** → you're in.
+Open **`http://127.0.0.1:5173`** in your browser and choose **Quick Guest Mode**!
 
 ---
 
-## 📁 Directory Map
+## 📂 Project Directory Map
 
 ```
 vibe2ship/
 ├── server/
-│   ├── agents/
-│   │   ├── plannerAgent.js       ← Subtask generator
-│   │   ├── priorityAgent.js      ← Priority scorer
-│   │   ├── schedulerAgent.js     ← Daily block planner
-│   │   ├── reminderAgent.js      ← Urgency alert writer
-│   │   ├── reflectionAgent.js    ← Productivity scorer
-│   │   ├── motivationAgent.js    ← Encouragement generator
-│   │   ├── recoveryAgent.js      ← Overdue task rebuilder  🆕
-│   │   └── rescueAgent.js        ← Stress analyser         🆕
-│   ├── routes/
-│   │   ├── tasks.js              ← CRUD + agent pipeline
-│   │   ├── ai.js                 ← Chat + plan + prioritize
-│   │   ├── analytics.js          ← Reflection + motivation
-│   │   ├── focus.js              ← Pomodoro endpoints       🆕
-│   │   ├── recovery.js           ← Recovery endpoints       🆕
-│   │   └── rescue.js             ← Rescue + memory          🆕
-│   ├── services/
-│   │   ├── firebase.js           ← DB abstraction layer
-│   │   ├── gemini.js             ← AI client + mock fallback
-│   │   └── userMemory.js         ← Cognitive profile tracker 🆕
-│   ├── data/db.json              ← Auto-created local DB
-│   └── index.js                  ← Express entry point
-│
+│   ├── agents/            ← 8 Independent AI Agent Modules
+│   ├── routes/            ← Express REST APIs (/tasks, /ai, /focus, etc.)
+│   ├── services/          ← Service abstractions (firebase.js, gemini.js)
+│   ├── data/db.json       ← Local JSON Database fallback
+│   └── index.js           ← Backend server runner
 ├── src/
-│   ├── components/
-│   │   ├── Navigation.tsx        ← Sidebar + mobile drawer
-│   │   ├── CrisisBanner.tsx      ← Deadline crisis alert    🆕
-│   │   ├── RescueCard.tsx        ← Stress assessment card   🆕
-│   │   ├── FocusTimer.tsx        ← Pomodoro ring timer      🆕
-│   │   └── ProductivityMemoryCard.tsx  ← Cognitive profile  🆕
-│   ├── pages/
-│   │   ├── LandingPage.tsx       ← Welcome + guest login
-│   │   ├── Dashboard.tsx         ← Command centre
-│   │   ├── TaskManagement.tsx    ← Task list + inspector
-│   │   ├── FocusSession.tsx      ← Focus mode page          🆕
-│   │   ├── AIChat.tsx            ← Natural language chat
-│   │   ├── CalendarView.tsx      ← Deadline calendar
-│   │   ├── Analytics.tsx         ← Charts + rescue + memory
-│   │   └── Settings.tsx          ← Preferences + diagnostics
-│   ├── services/
-│   │   ├── firebase.ts           ← Auth SDK wrapper
-│   │   └── api.ts                ← REST client (all endpoints)
-│   ├── App.tsx                   ← Auth guard + page router
-│   └── index.css                 ← BMW M design system CSS
-│
-├── USER_GUIDE.txt                ← End-user documentation
-├── structure.txt                 ← Developer documentation
-├── design.md                     ← Design system reference
-└── README.md                     ← This file
+│   ├── components/        ← Navigation, FocusTimer, CrisisBanner UI components
+│   ├── pages/             ← Dashboard, Task Manager, Focus Session, Calendar page views
+│   ├── services/          ← REST Client (api.ts) & Firebase client Auth (firebase.ts)
+│   └── index.css          ← BMW M Motorsport canvas typography and CSS
+├── USER_GUIDE.txt         ← Detailed end-user manual & FAQ
+└── structure.txt          ← Deep-dive developer manual & schema tables
 ```
-
----
-
-## 🔌 API Endpoints
-
-| Method | Path | Description |
-|---|---|---|
-| GET | `/api/health` | Server health check |
-| GET | `/api/tasks` | List all user tasks |
-| POST | `/api/tasks` | Create task (triggers Planner, Priority, Reminder) |
-| PUT | `/api/tasks/:id` | Update task; completion triggers streak + memory |
-| DELETE | `/api/tasks/:id` | Delete a task |
-| POST | `/api/ai/chat` | AI chat + natural language task extraction |
-| POST | `/api/ai/plan` | Generate Scheduler time blocks |
-| POST | `/api/ai/prioritize` | Re-run Priority Agent on all tasks |
-| GET | `/api/analytics` | Reflection score + motivation + streak data |
-| GET | `/api/analytics/rescue` | 🆕 Rescue Agent stress analysis |
-| GET | `/api/analytics/memory` | 🆕 Cognitive memory profile |
-| GET | `/api/recovery/status` | 🆕 Overdue task count (lightweight) |
-| POST | `/api/recovery/check` | 🆕 Run Recovery Agent on overdue tasks |
-| GET | `/api/focus/stats` | 🆕 Pomodoro session statistics |
-| POST | `/api/focus/session/complete` | 🆕 Record a completed Pomodoro |
-| POST | `/api/focus/schedule` | 🆕 Generate AI Pomodoro schedule |
-
----
-
-## 🧠 Architecture Diagram
-
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│  FRONTEND  React + TypeScript + Vite  (port 5173)                    │
-│  ┌──────────────────────────────────────────────────────────────┐    │
-│  │  Pages: Dashboard · Tasks · Focus · Chat · Calendar ·        │    │
-│  │          Analytics · Settings                                │    │
-│  │  Components: Navigation · CrisisBanner · RescueCard ·        │    │
-│  │             FocusTimer · ProductivityMemoryCard              │    │
-│  └───────────────────────┬──────────────────────────────────────┘    │
-└──────────────────────────┼───────────────────────────────────────────┘
-                           │  REST API  /api/*  (Vite proxy)
-┌──────────────────────────▼───────────────────────────────────────────┐
-│  BACKEND  Node.js + Express  (port 5000)                             │
-│                                                                       │
-│  Routes:  /tasks · /ai · /analytics · /focus · /recovery · /rescue   │
-│                                                                       │
-│  Agents:  Planner · Priority · Scheduler · Reminder ·                │
-│           Reflection · Motivation · Recovery · Rescue                │
-│                                                                       │
-│  Services: firebase.js (DB) · gemini.js (AI) · userMemory.js (Profile)│
-│                                                                       │
-│  ┌─────────────────┐  ┌──────────────────────┐                       │
-│  │  Gemini API     │  │  Firebase Firestore   │                       │
-│  │  (or Mock Mode) │  │  (or local db.json)   │                       │
-│  └─────────────────┘  └──────────────────────┘                       │
-└──────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 🚀 Running Modes
-
-| Mode | GEMINI_API_KEY | Firebase vars | Description |
-|---|---|---|---|
-| **Full Production** | ✅ Set | ✅ Set | Real AI + Firestore |
-| **AI + Local DB** | ✅ Set | ❌ Not set | Real AI + db.json |
-| **Offline / Emulator** | ❌ Not set | ❌ Not set | Mock AI + db.json ← **default** |
-| **Firebase + Mock AI** | ❌ Not set | ✅ Set | Mock AI + Firestore |
-
----
-
-## 📋 Notes
-
-- **TypeScript** — `npx tsc --noEmit` passes with zero errors across the entire frontend.
-- **nodemon.json** — configured to ignore `server/data/**` to prevent infinite restart loops when db.json is written during requests.
-- **Vite proxy** — all `/api/*` requests are proxied to `http://127.0.0.1:5000` in `vite.config.ts`. No CORS configuration needed.
-- **ESM** — the backend uses ES Module syntax (`import`/`export`) throughout. The `package.json` has `"type": "module"`.
