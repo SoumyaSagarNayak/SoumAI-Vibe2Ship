@@ -1,4 +1,5 @@
-import { useState, MouseEvent } from 'react';
+import { useState } from 'react';
+import type { MouseEvent } from 'react';
 import { 
   Trash2, 
   CheckSquare, 

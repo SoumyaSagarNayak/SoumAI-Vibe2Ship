@@ -52,7 +52,6 @@ export default function AIChat() {
 
     const userText = input;
     setInput('');
-    setError('');
 
     const userMsg: Message = {
       id: Math.random().toString(),

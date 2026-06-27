@@ -21,8 +21,8 @@ const firebaseConfig = {
 
 const isFirebaseConfigured = !!(firebaseConfig.apiKey && firebaseConfig.projectId);
 
-let app;
-let auth;
+let app: any;
+let auth: any;
 
 if (isFirebaseConfigured) {
   try {
@@ -48,7 +48,7 @@ export interface UserProfile {
 export const authService = {
   isRealFirebase: () => isRealFirebaseConfigured(),
 
-  async signUp(email, password) {
+  async signUp(email: string, password: string) {
     if (isFirebaseConfigured && auth) {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       return {
@@ -66,7 +66,7 @@ export const authService = {
     }
   },
 
-  async signIn(email, password) {
+  async signIn(email: string, password: string) {
     if (isFirebaseConfigured && auth) {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const token = await userCredential.user.getIdToken();
@@ -140,7 +140,7 @@ export const authService = {
   },
 
   // Monitor auth changes
-  subscribe(callback) {
+  subscribe(callback: (user: UserProfile | null) => void) {
     if (isFirebaseConfigured && auth) {
       return onAuthStateChanged(auth, async (user) => {
         if (user) {
