@@ -48,6 +48,9 @@ Unlike passive to-do apps, SOUM AI Companion runs agents automatically in the ba
 - **Focus Session Engine** — Pomodoro timer (50 min work / 10 min break) with AI-generated session schedules.
 - **Memory Intelligence** — builds a Cognitive Profile from your task completion patterns over time.
 - **Focus Analytics** — tracks total focus hours, deep work hours, session count, daily/weekly streaks.
+- **Offline Caching & Local Storage** — complete offline fallback; instantly caches tasks, calendar items, focus statistics, and analytics to local storage when server is unreachable.
+- **Routine Tasks Generator** — registers daily recurring templates (e.g. Gym, DSA, Development pre-populated) and spawns checkable checklist instances on designated days.
+- **Calendar Recurrence Mapping** — displays recurring templates visually as mock task items on the calendar grid, color-coded and marked as complete/pending dynamically.
 
 ---
 

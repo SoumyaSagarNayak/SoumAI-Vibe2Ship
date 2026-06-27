@@ -200,7 +200,14 @@ CREATE TASK BUTTON  (+)
       Importance    — Slider from 1 (low) to 5 (critical)
       Est. Effort   — How many minutes do you think it will take?
       Category      — School / Work / Personal / Health / General / etc.
-  • Click Save. All 6 agents immediately process it in the background.
+      Repeat Task (Routine) — [NEW] Toggle checkbox to define routine schedules:
+         - Every single day: creates this task instance automatically every day.
+         - Specific days of the week: select Monday to Sunday to repeat only on those days.
+   • Click Save. All 6 agents immediately process it in the background.
+
+TASK LIST TABS [NEW]
+  - Active Tasks: Lists all checkable task instances generated for today.
+  - Routine Templates: Shows your recurring templates (like Gym, DSA, Dev, Yoga) and their schedules. Delete a template here to stop it from generating in the future.
 
 TASK CARDS
   • Each card shows: title, priority badge, deadline, category tag, progress bar.
@@ -329,6 +336,8 @@ A monthly calendar grid that gives you a visual overview of all deadlines.
   • Hover a date to see a tooltip listing all tasks due that day.
   • Use the left/right arrows to navigate between months.
   • Click a task name to jump directly to it in the Task Manager.
+  • RECURRING / ROUTINE TASKS [NEW] are mapped across all days they are scheduled to repeat. They are prefixed with the repeat icon '🔁'. Past routine days are shown as completed (strike-through), and future routine days are shown as pending.
+  • Clicking a mock routine task on the calendar will display a notice informing you it is a routine task, preventing edits to virtual calendar items.
 
 USE THIS PAGE TO:
   • Spot "deadline clusters" (days where too many things are due at once).
@@ -661,6 +670,13 @@ Q: Where is my data saved?
 A: In server/data/db.json — a local JSON file on your machine. It persists
    between server restarts. No data is sent to any cloud unless you configure
    Firebase credentials in .env.
+
+Q: What happens if the backend server goes down or is offline? [NEW]
+A: The application automatically transitions to a Local Storage Offline Mode.
+   All task list views, calendars, focus statistics, and analytics continue to
+   load instantly from the browser cache. Any task creates, completions, and deletions 
+   you perform while offline are recorded locally and sync reactively in the UI. A yellow
+   warning banner will notify you of the offline status.
 
 Q: Why does the Cognitive Profile show dashes and zeroes?
 A: You haven't completed enough tasks yet. Complete at least 5–10 tasks by

@@ -56,6 +56,9 @@ KEY DESIGN DECISIONS:
      module syntax. No CommonJS require() calls.
   5. nodemon.json: ignores server/data/** to prevent infinite restarts when
      db.json is written during request handling.
+  6. Client-Side Offline Fallback: [NEW] If the backend server is unreachable,
+     the frontend automatically switches to a complete offline fallback using
+     local storage caching, enabling full use of the app without data loss.
 
 ================================================================================
 SECTION 2  —  COMPLETE FOLDER STRUCTURE
@@ -523,6 +526,10 @@ The db.json file is structured as follows:
         "category": string,
         "urgency": "critical" | "important" | "medium" | "normal", [NEW]
         "notes": string, [NEW]
+        "isRecurring": boolean | undefined, [NEW]
+        "recurrenceDays": string[] | undefined, [NEW]
+        "parentTaskId": string | undefined, [NEW]
+        "recurrenceDate": string | undefined, [NEW]
         "importance": number,
         "estimatedEffort": number,
         "subtasks": [
